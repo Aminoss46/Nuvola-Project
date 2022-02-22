@@ -10,7 +10,7 @@ pipeline {
                 sh 'docker build -t nuvola:2.0 .'
             }
         }
-        stage(Deploy Image') {
+        stage('Deploy Image') {
 	  steps{
             script {
               docker.withRegistry('',registryCredential){
