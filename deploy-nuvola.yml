@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-nuvola
+
+spec:
+  selector:
+    matchLabels:
+      app: nuvolapp
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: nuvolapp
+    spec:
+      containers:
+      - name: nuvola-webserver-container
+        image: akkafranck/nuvola:1.0
+        imagePullPolicy: Always
+        env:
+        - name: APP_PORT
+          value: "4000"
+        - name: MONGO_HOST
+          value: "service-mongodb"
+        ports: 
+        - containerPort: 4000 # le serveur conteneurisé écoute le 4000 (code source)
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-nuvola
+spec:
+  type: NodePort
+  selector: 
+    app: nuvolapp
+  ports:
+  - port: 4000
+    targetPort: 4000
+    nodePort: 31700
+    protocol: TCP
