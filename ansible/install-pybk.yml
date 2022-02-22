@@ -1,0 +1,64 @@
+- name: Projet
+  hosts: dev1
+  gather_facts: no
+
+  vars:
+    user: jeanrachid
+
+  tasks:
+  - name: Ensure group "developers" exists
+    ansible.builtin.group:
+      name: developers
+      state: present
+  
+  - name: install docker
+    become: yes
+    apt:
+      update_cache: yes
+      name: docker.io
+      state: present
+
+  - name: install nodejs
+    become: yes
+    apt:
+      name: nodejs
+      state: present 
+  
+  - name: install npm
+    become: yes
+    apt:
+      name: npm
+      state: present
+
+  - name: Création compte utilisateur
+    become: yes
+    user:
+      name: jeanrachid
+      shell: /bin/bash
+      password: "{{ 'jean' | password_hash('sha512') }}"
+
+  - name: Add user to group
+    user:
+      name: jeanrachid
+      groups: '{{item}}'
+      append: yes
+    loop: ['docker','developers']
+
+  - name: Pull des images docker
+    become: yes
+    shell: docker pull node:14-alpine && docker pull mongo:4.4 
+
+  - name: git clone du rep
+    become: yes
+    git:
+      repo: 'https://github.com/cdufour/nuvolapp.git'
+      dest: /home/jeanrachid/projet_final2
+
+  - name: chgmt de droits
+    become: yes
+    file:
+      path: /home/jeanrachid/projet_final2
+      state: directory
+      recurse: yes
+      owner: jeanrachid
+      group: docker
