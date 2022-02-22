@@ -1,7 +1,7 @@
 pipeline {
   environment {
     registry = 'akkafranck/nuvola'
-    registryCredential = 'akkafranck'
+    registryCredential = 'DockerHub'
   }
     agent any
     stages {
